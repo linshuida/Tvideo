@@ -1,0 +1,124 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>后台首页</title>
+    <link rel="stylesheet" type="text/css" href="__STATIC__/css/layui.css">
+    <script type="text/javascript" src="__STATIC__/layui.js"></script>
+    <style>
+        .layui-side-scroll .layui-nav {
+            border-radius: 0px;
+        }
+    </style>
+</head>
+<body class="layui-layout-body">
+<div class="layui-layout layui-layout-admin">
+    <div class="layui-header">
+        <div class="layui-logo"><a href="{:url('home/index')}" style=" color: #fff;/* width: 140px;float: left*/">{$site.siteValues}-<span style="font-size: 12px">后台管理系统</span></a></div>
+        <!-- 头部区域（可配合layui已有的水平导航） -->
+        <!--<ul class="layui-nav layui-layout-left">
+            <li class="layui-nav-item"><a href="">控制台</a></li>
+            <li class="layui-nav-item"><a href="">商品管理</a></li>
+            <li class="layui-nav-item"><a href="">用户</a></li>
+            <li class="layui-nav-item">
+                <a href="javascript:;">其它系统</a>
+                <dl class="layui-nav-child">
+                    <dd><a href="">邮件管理</a></dd>
+                    <dd><a href="">消息管理</a></dd>
+                    <dd><a href="">授权管理</a></dd>
+                </dl>
+            </li>
+        </ul>-->
+        <ul class="layui-nav layui-layout-right">
+            <li class="layui-nav-item">
+                <a href="javascript:;">
+                    <!--<img src="http://t.cn/RCzsdCq" class="layui-nav-img">-->
+                    {$admin.username}【{$role.title}】
+                </a>
+                <!--<dl class="layui-nav-child">
+                    <dd><a href="">基本资料</a></dd>
+                    <dd><a href="">安全设置</a></dd>
+                </dl>-->
+            </li>
+            <li class="layui-nav-item"><a style="cursor: Pointer;" onclick="loginout()">退出</a></li>
+        </ul>
+    </div>
+
+    <div class="layui-side layui-bg-black">
+        <div class="layui-side-scroll" >
+            <!-- 左侧导航区域（可配合layui已有的垂直导航） -->
+            <ul class="layui-nav layui-nav-tree"  lay-filter="test" id="menu" lay-shrink="all">
+                {volist name="meuns" id="vo"}
+                <li class="layui-nav-item layui-nav-itemed">
+                    <a class="" href="javascript:;" >{$vo.title}</a>
+                    <?php if(isset($vo['children']) && $vo['children']){?>
+                    <dl class="layui-nav-child">
+                        {volist name="vo.children" id="cvo"}
+                        <dd><a href="javascript:;" onclick="menuFire(this)" src="../{$cvo.controller}/{$cvo.method}" >{$cvo.title}</a></dd>
+                        {/volist}
+                    </dl>
+                   <?php }?>
+                </li>
+                {/volist}
+                <!--<li class="layui-nav-item">
+                    <a href="javascript:;">权限管理</a>
+                    <dl class="layui-nav-child">
+                        <dd><a href="javascript:;" onclick="menuFire(this)" src="{:url('menu/index')}">菜单管理</a></dd>
+                        <dd><a href="javascript:;" onclick="menuFire(this)" src="{:url('roles/index')}">角色管理</a></dd>
+                        <dd><a href="">超链接</a></dd>
+                    </dl>
+                </li>
+                <li class="layui-nav-item"><a href="">系统设置</a></li>
+                <li class="layui-nav-item"><a href="">发布商品</a></li>-->
+            </ul>
+        </div>
+    </div>
+
+    <div class="layui-body">
+        <!-- 内容主体区域 -->
+       <iframe src="{:url('home/welcome')}" frameborder="0" scrolling="auto" style="width: 100%;height: 100%;"></iframe>
+    </div>
+
+    <div class="layui-footer">
+        <!-- 底部固定区域 -->
+        © layui.com - 底部固定区域
+    </div>
+</div>
+<script>
+    //JavaScript代码区域
+    layui.use('element', function(){
+        var element = layui.element;
+    });
+    layui.use(['layer'],function () {
+        $ = layui.jquery;
+    });
+
+    function resetMenuHeight() {
+        var height = document.documentElement.clientHeight - 180;
+    }
+    function menuFire(obj) {
+        //获取url
+        var src = $(obj).attr('src');
+        //设置iframe的URL
+        $('iframe').attr('src',src);
+    }
+
+    function loginout() {
+        layer.confirm('确定退出？', {
+            btn: ['确定','取消'] //按钮
+        }, function() {
+            $.get('{:url("account/loginout")}', function (res) {
+                if (res.code > 0) {
+                    layer.alert(res.msg, {icon: 2});
+                } else {
+                    layer.msg(res.msg);
+                    setTimeout(function () {
+                        window.location.href = "{:url('account/login')}";
+                    }, 1000);
+                }
+            }, 'json')
+        })
+    }
+</script>
+</body>
+</html>

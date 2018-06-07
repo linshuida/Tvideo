@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>角色添加</title>
+    <link rel="stylesheet" type="text/css" href="__STATIC__/css/layui.css">
+    <script type="text/javascript" src="__STATIC__/layui.js"></script>
+    <style>
+        .aa span{
+            color: #FFB800 !important;
+        }
+    </style>
+</head>
+<body>
+
+<form class="layui-form" style="padding: 15px;">
+    <input type="hidden" value="{$role.gid}" name="gid">
+    <div class="layui-form-item">
+        <label class="layui-form-label">角色名称</label>
+        <div class="layui-input-block">
+            <input type="text" name="title" value="{$role.title}" required  lay-verify="required" placeholder="请输入标题" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label" >权限菜单</label>
+        {volist name="menu" id="vo"}
+        <div class="layui-input-block aa">
+            <input type="checkbox"  lay-skin="primary" name="menu[{$vo.mid}]" title="{$vo.title}" {:isset($role['rights']) && $role['rights'] && in_array($vo.mid,$role['rights'])?'checked':''}>
+            <hr >
+        </div>
+        {if ($vo.children)}
+        <div class="layui-input-block">{/if}
+            {volist name="vo.children" id="cvo"}
+            <input type="checkbox" lay-skin="primary" name="menu[{$cvo.mid}]" title="{$cvo.title}" {:isset($role['rights']) && $role['rights'] && in_array($cvo.mid,$role['rights'])?'checked':''}>
+            {/volist}
+        {if ($vo.children)}<hr ></div>{/if}
+        {/volist}
+    </div>
+
+</form>
+<div class="layui-form-item">
+    <div class="layui-input-block">
+        <button class="layui-btn" lay-submit lay-filter="formDemo" onclick="save()">保存</button>
+    </div>
+</div>
+
+<script>
+    //Demo
+    layui.use('form', function(){
+        var form = layui.form;
+    });
+    layui.use('element', function(){
+        var element = layui.element;
+        //…
+    });
+    layui.use(['layer'],function () {
+        layer = layui.layer;
+        $ = layui.jquery;
+    });
+    function save() {
+        var title = $.trim($('input[name="title"]').val());
+        if (title ==''){
+            layer.msg('角色名字不为空！');
+            return
+        }
+        $.post('{:url("roles/save")}',$('form').serialize(),function (res) {
+            if (res.code>0){
+                layer.alert(res.msg,{icon:2});
+            }else {
+                layer.msg(res.msg);
+                setTimeout(function () {
+                    parent.window.location.reload();
+                },1000);
+            }
+        },'json');
+
+    }
+</script>
+</body>
+</html>

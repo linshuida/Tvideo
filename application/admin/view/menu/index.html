@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" type="text/css" href="__STATIC__/css/layui.css">
+    <script type="text/javascript" src="__STATIC__/layui.js"></script>
+    <style>
+        .layui-nav .layui-nav-item {
+            line-height: 45px;
+        }
+    </style>
+</head>
+<body>
+<div class="header">
+    <!--
+        <span>管理员列表</span>
+    -->
+    <ul class="layui-nav" lay-filter="">
+        <li class="layui-nav-item"><a href="">管理员列表</a></li>
+<!--
+        <li class="layui-nav-item" style="float: right;"><button class="layui-btn" onclick="add()"><i class="layui-icon">&#xe608;</i> 添加</button></li>
+-->
+    </ul>
+</div>
+
+<form class="layui-form">
+
+    <input type="hidden" name="pid" value="{$pid}">
+    {if condition="$pid>0"}
+    <button class="layui-btn layui-btn-sm layui-btn-primary" onclick="back({$backid}); return false;" style="float: right;margin: 5px 0;">返回上级</button>
+    {/if}
+<table class="layui-table">
+    <!--colgroup>
+        <col width="150">
+        <col width="200">
+        <col>
+    </colgroup>-->
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>排序</th>
+        <th>菜单名称</th>
+        <th>ccontroller</th>
+        <th>method</th>
+        <th>是否隐藏</th>
+        <th>是否禁用</th>
+        <th></th>
+    </tr>
+    </thead>
+    <tbody>
+    {volist name="data.lists" id="vo"}
+    <tr>
+        <td>{$vo.mid}</td>
+        <td><input type="text" value="{$vo.orders}" name="orders[{$vo.mid}]" class="layui-input"></td>
+        <td class=""><input type="text" value="{$vo.title}" name="title[{$vo.mid}]" placeholder="请输入标题"class="layui-input"></td>
+        <td><input type="text" value="{$vo.controller}" name="controller[{$vo.mid}]" class="layui-input"></td>
+        <td><input type="text" value="{$vo.method}" name="method[{$vo.mid}]" class="layui-input"></td>
+        <td ><input type="checkbox" name="ishidden[{$vo.mid}]" value="1" title="隐藏" {$vo.ishidden?'checked':''}></td>
+        <td ><input type="checkbox" name="status[{$vo.mid}]" value="1" title="禁用" {$vo.status?'checked':''}></td>
+        <td>
+            <button class="layui-btn layui-btn-sm" style="margin-bottom: 10px;" onclick="child({$vo.mid}); return false;">子菜单</button>
+            <br/><button class="layui-btn layui-btn-sm" onclick="deletes({$vo.mid}); return false;">删除</button>
+        </td>
+    </tr>
+    {/volist}
+
+    <tr>
+        <td></td>
+        <td><input type="text" name="orders[0]" class="layui-input"></td>
+        <td class=""><input type="text" name="title[0]" placeholder=""class="layui-input"></td>
+        <td><input type="text" name="controller[0]" class="layui-input"></td>
+        <td><input type="text" name="method[0]" class="layui-input"></td>
+        <td ><input type="checkbox" name="ishidden[0]" value="1" title="隐藏" ></td>
+        <td ><input type="checkbox" name="status[0]" value="1" title="禁用" ></td>
+        <td></td>
+    </tr>
+
+
+    </tbody>
+</table>
+</form>
+<div class="layui-form-item">
+    <div class="layui-input-block">
+        <button class="layui-btn layui-btn-lg" onclick="save(); return false;" >保存</button>
+    </div>
+</div>
+<script>
+    layui.use('element', function(){
+        var element = layui.element;
+        //…
+    });
+    //Demo
+    layui.use(['layer','form'], function(){
+        var form = layui.form;
+        layer = layui.layer;
+        $ = layui.jquery;
+    });
+    
+    function child(pid) {
+        window.location.href="{:url('menu/index')}?pid="+pid;
+    }
+    function back(pid) {
+        window.location.href="{:url('menu/index')}?pid="+pid;
+    }
+    
+    function save() {
+        $.post('{:url("menu/save")}',$('form').serialize(),function (res) {
+            if (res>0){
+                layer.alert(res.msg,{icon:2});
+            }else {
+                layer.alert(res.msg);
+                setTimeout(function () {
+                    window.location.reload();
+                },1000)
+            }
+        },'json');
+    }
+    function deletes(mid){
+        layer.confirm('确定删除？', {
+            btn: ['确定','取消'] //按钮
+        }, function(){
+            $.post('{:url("menu/deletes")}',{'mid':mid},function (res) {
+                if (res.code >0 ){
+                    layer.alert(res.msg,{icon:2});
+                }else {
+                    layer.alert(res.msg);
+                    setTimeout(function () {
+                        window.location.reload();
+                    },1000);
+                }
+            },'json');
+        });
+    }
+
+</script>
+
+</body>
+</html>

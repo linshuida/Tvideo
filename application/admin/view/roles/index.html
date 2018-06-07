@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>角色管理</title>
+    <link rel="stylesheet" type="text/css" href="__STATIC__/css/layui.css">
+    <script type="text/javascript" src="__STATIC__/layui.js"></script>
+    <style>
+        .layui-nav .layui-nav-item {
+            line-height: 45px;
+        }
+    </style>
+</head>
+<body>
+<div class="header">
+    <!--
+        <span>管理员列表</span>
+    -->
+    <ul class="layui-nav" lay-filter="">
+        <li class="layui-nav-item"><a href="">角色列表</a></li>
+        <li class="layui-nav-item" style="float: right;"><button class="layui-btn" onclick="add()"><i class="layui-icon">&#xe608;</i> 添加</button></li>
+        <!--<li class="layui-nav-item layui-this"><a href="">产品</a></li>
+        <li class="layui-nav-item"><a href="">大数据</a></li>
+        <li class="layui-nav-item">
+            <a href="javascript:;">解决方案</a>
+            <dl class="layui-nav-child"> &lt;!&ndash; 二级菜单 &ndash;&gt;
+                <dd><a href="">移动模块</a></dd>
+                <dd><a href="">后台模版</a></dd>
+                <dd><a href="">电商平台</a></dd>
+            </dl>
+        </li>
+        <li class="layui-nav-item"><a href="">社区</a></li>-->
+    </ul>
+</div>
+
+
+<table class="layui-table">
+    <!--<colgroup>
+        <col width="150">
+        <col width="200">
+        <col>
+    </colgroup>-->
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>角色名称</th>
+        <th>操作</th>
+    </tr>
+    </thead>
+    <tbody>
+    {volist name="$data.roles" id="vo"}
+    <tr>
+        <td>{$vo.gid}</td>
+        <td>{$vo.title}</td>
+        <td>
+            <button class="layui-btn layui-btn-sm" onclick="add({$vo.gid})">
+                <i class="layui-icon">&#xe642;</i>编辑
+            </button>
+            <button class="layui-btn layui-btn-sm " onclick="del({$vo.gid})">
+                <i class="layui-icon">&#xe640;</i>删除
+            </button>
+        </td>
+    </tr>
+    {/volist}
+    </tbody>
+</table>
+
+<script>
+    //注意：导航 依赖 element 模块，否则无法进行功能性操作
+    layui.use('element', function(){
+        var element = layui.element;
+        //…
+    });
+    layui.use(['layer'],function () {
+        layer = layui.layer;
+        $ = layui.jquery;
+    });
+    
+    function add(gid) {
+        layer.open({
+            type: 2,
+            title: gid>0?'编辑角色':'添加角色',
+            shade: 0.3,
+            area: ['480px','420px'],
+            content: '{:url("roles/add")}?gid='+gid //iframe的url
+        });
+    }
+    
+    function del(gid) {
+        layer.confirm('确定删除？', {
+            icon:3,
+            btn: ['确定','取消'] //按钮
+        }, function(){
+            $.post('{:url("roles/delete")}',{'gid':gid},function (res) {
+                if (res.code >0 ){
+                    layer.alert(res.msg,{icon:2});
+                }else {
+                    layer.alert(res.msg);
+                    setTimeout(function () {
+                        window.location.reload();
+                    },1000);
+                }
+            },'json');
+        });
+    }
+</script>
+</body>
+</html>
